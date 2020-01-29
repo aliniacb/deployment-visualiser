@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "create-env": "./scripts/create-env.sh"
   },
   "dependencies": {
     "aws-sdk": "^2.610.0",
