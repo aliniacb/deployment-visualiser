@@ -32,14 +32,6 @@ function listServices() {
 }
 
 function getServices() {
-    const teamServices = (services, teamServices) => {
-        const result = []
-        services.forEach(s => {
-            if (teamServices.includes(s.name)) result.push(s)
-        })
-        return result
-    }
-
     return listServices()
         .then(data => {
             return data.serviceArns.map(serviceArn => {
@@ -55,20 +47,61 @@ function getServices() {
                 const serviecEnvVar = `VUE_APP_${team.toUpperCase()}_SERVICES`
                 console.log(`Getting variable: ${serviecEnvVar}`)
                 const teamServices = process.env[serviecEnvVar].split(',')
-                result[team] = teamServices
+
+                services.forEach(s => {
+                    teamServices.forEach(ts => {
+                        if (ts == s.name) {
+                            if (!result[team]) {
+                                result[team] = [s]
+                            } else {
+                                result[team].push(s)
+                            }
+                        }
+                    })
+                })
             })
             return result
         })
 }
 
-function getTeamStatus(teamName) {
-    return [{
-        deploymentInProgress: true,
-        numDeployments: 2,
-        oldDeploymentNumTasks: 1,
-        newDeploymentNumTasks: 2,
-        desiredCount: 3
-    }]
+function describeServices(serviceArns) {
+    return new Promise((resolve, reject) => {
+        var params = {
+            services: serviceArns,
+            cluster: clusterName,
+        };
+        ecs.describeServices(params, function(err, data) {
+            if (err) reject(err)
+            else resolve(data)
+        })
+    })
+}
+
+async function getTeamStatus(teamServices) {
+    let result = await describeServices(teamServices.map(s => s.serviceArn))
+
+    return result.services.map((s) => {
+        const activeDeployment = s.deployments.find(d => d.status === "PRIMARY")
+        const secondaryDeployment = s.deployments.find(d => d.status !== "PRIMARY")
+
+        let status = {
+            name: s.serviceName.split('-')[1],
+            deploymentInProgress: s.deployments.length > 1,
+            numDeployments: s.deployments.length,
+        }
+
+        if (secondaryDeployment) {
+            console.log(s)
+            status = {
+                ...status,
+                oldDeploymentNumTasks: secondaryDeployment.runningCount,
+                newDeploymentNumTasks: activeDeployment.runningCount,
+                desiredCount: s.desiredCount,
+            }
+        }
+
+        return status
+    })
 }
 
 export default {

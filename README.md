@@ -7,6 +7,10 @@ yarn install
 
 ### Local dev
 
+* To run locally you will need to have the variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in your local environment.
+    * Then run `yarn create-env` which will spit these out into the local environment file (that is not stored in Git).
+    * When running `yarn serve` these credentials will now be available in the app.
+
 * Add an environment variable with the team and service names comma separated:
 ```
 VUE_APP_TEAMS= # comma separated list of teams as per below variables
