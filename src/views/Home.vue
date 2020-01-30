@@ -5,12 +5,15 @@
         <div class="columns is-vcentered is-fullheight">
           <div class="column is-5">
             <div class="columns is-multiline">
-              <Team :ref="`t-${i}`" v-for="(team, teamName, i) in teams" :data="team" :teamName="teamName" :key="i"/>
+              <Team :ref="`t-${i}`" v-for="(team, teamName, i) in teams" :data="team" :teamName="teamName" :key="teamName"/>
             </div>
           </div>
           <div class="column is-6 is-offset-1">
             <transition-group name="slide-fade" tag="div" :class="'columns is-multiline is-vcentered is-fullheight'">
-              <Status :ref="`s-${i}`" v-for="(team, teamName, i) in teams"  v-if="team.find(t => t.running)" :data="team" :key="i" />
+              <Status :ref="`s-${i}`" v-for="(team, teamName, i) in teams"
+                v-if="team.find(t => t.deploymentInProgress)"
+                :data="team" :key="`${i}-d`"
+              />
             </transition-group>
           </div>
         </div>
@@ -23,6 +26,7 @@
 <script>
 import Team from '@/components/Team.vue'
 import Status from '@/components/Status.vue'
+import mock from '@/services/mock.js'
 
 export default {
   name: 'home',
@@ -35,29 +39,11 @@ export default {
     return {
       ctx: null,
       teams: {
-        'Core services': [
-          { name: 'service2', running: false },
-          { name: 'service2' }
-        ],
-        'Euro': [
-          { name: 'service1', running: false },
-          { name: 'service2' },
-          { name: 'service2' }
-        ],
-        'Platform': [
-          { name: 'service1', running: false },
-          { name: 'service2' }
-        ],
-        'International': [
-          { name: 'service1', running: false },
-        ],
-        'Uk': [
-          { name: 'service1', running: false },
-          { name: 'service2' },
-          { name: 'service2' }
-        ],
       }
     }
+  },
+  created() {
+    this.mapDataToTeams()
   },
   mounted() {
     this.$refs.c.width = document.body.scrollWidth
@@ -66,15 +52,30 @@ export default {
 
     this.tick()
 
-    setInterval(this.fakeActive.bind(this), 3000)
+    setInterval(this.fetchData.bind(this), 3000)
   },
 
   methods: {
-    fakeActive() {
+    fetchData() {
+      this.mapDataToTeams()
+
       const i = Math.floor(Math.random() * Object.keys(this.teams).length)
       let team = this.teams[Object.keys(this.teams)[i]][0]
-      team.running === true ? team.running = false : team.running = true
+      team.deploymentInProgress === true ? team.deploymentInProgress = false : team.deploymentInProgress = true
+      console.log(i, team)
       this.updateCanvasSize()
+    },
+
+    mapDataToTeams() {
+      let mapped = {}
+
+      mock.slice().forEach((e) => {
+        if (!mapped[e[0].team]) {
+          mapped[e[0].team] = e
+        }
+      })
+
+      this.teams = mapped
     },
 
     updateCanvasSize() {
@@ -110,6 +111,7 @@ export default {
       this.ctx.lineWidth = 5
       this.ctx.lineJoin = 'round'
       this.ctx.lineCap = 'round'
+
       for (let line of this.getDrawCoord()) {
         if (line.to.x !== 0) {
           this.ctx.moveTo(line.from.x, line.from.y)
@@ -118,6 +120,7 @@ export default {
           this.ctx.lineTo(line.to.x, line.to.y)
         }
       }
+
       this.ctx.stroke()
     },
     tick() {
@@ -125,6 +128,9 @@ export default {
       this.ctx.clearRect(0, 0, this.$refs.c.width, this.$refs.c.height)
       this.render()
     }
+  },
+
+  computed: {
   }
 }
 </script>

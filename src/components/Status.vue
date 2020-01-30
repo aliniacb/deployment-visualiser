@@ -1,7 +1,18 @@
 <template>
-  <div :class="{'is-hidden': !hasPendingEvents }" class="column is-12">
-    <div :class="{'shrinked': !hasPendingEvents }" class="box service-status">
-      <h4 class="title is-4 has-text-centered">Status updates</h4>
+  <div class="column is-12">
+    <div class="box service-status">
+      <div class="columns is-multiline">
+        <div v-for="(event, i) in pendingEvents" :key="i" class="column is-12">
+          <div class="level">
+            <div class="level-left">
+              <p>{{event.name}}</p>
+            </div>
+            <div class="level-right">
+              <p>Deployments: {{event.numDeployments}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -15,8 +26,8 @@ export default {
   },
 
   computed: {
-    hasPendingEvents() {
-      return this.data.find(e => e.running)
+    pendingEvents() {
+      return this.data.filter(e => e.deploymentInProgress)
     }
   }
 }

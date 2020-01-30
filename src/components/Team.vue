@@ -5,12 +5,14 @@
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <h1 class="title is-3 has-text-centered">{{ teamName }}</h1>
+            <h1 class="title is-3 has-text-centered is-capitalized">{{ teamName }}</h1>
           </div>
         </div>
         <div class="level-right">
           <div class="level-item">
-            <h3 class="title is-5 has-text-success"> All services running</h3>
+            <h3 :class="{'has-text-info': updating > 0, 'has-text-success': updating === 0 }" class="title is-5">
+              {{ message }}
+            </h3>
           </div>
         </div>
       </div>
@@ -26,6 +28,16 @@ export default {
   methods: {
     getRandomColor() {
       return `hsla(${Math.random() * 360}, 90%, 60%, 1)`
+    }
+  },
+
+  computed: {
+    updating() {
+      return this.data.filter(e => e.deploymentInProgress).length
+    },
+
+    message() {
+      return this.updating > 0 ? `Deploying ${this.updating} ${this.updating > 1 ? 'services' : 'service'}` : 'All services running'
     }
   }
 }
