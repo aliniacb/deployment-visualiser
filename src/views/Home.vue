@@ -62,7 +62,6 @@ export default {
       const i = Math.floor(Math.random() * Object.keys(this.teams).length)
       let team = this.teams[Object.keys(this.teams)[i]][0]
       team.deploymentInProgress === true ? team.deploymentInProgress = false : team.deploymentInProgress = true
-      console.log(i, team)
       this.updateCanvasSize()
     },
 
