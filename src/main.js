@@ -18,7 +18,7 @@ async function example() {
   console.log(statuses)
 }
 
-example()
+// example()
 
 
 
