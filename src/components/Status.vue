@@ -24,7 +24,6 @@ export default {
 
 <style lang="scss">
   .service-status {
-    height: 300px;
     box-shadow: -5px -2px 20px 0px rgba(0, 0, 0, 0.1);
   }
 </style>
