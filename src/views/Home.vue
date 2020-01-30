@@ -48,22 +48,25 @@ export default {
         ],
         'Platform': [
           { name: 'service1' },
+          { name: 'service1', running: true },
           { name: 'service2' }
         ],
         'International': [
           { name: 'service1' },
+          { name: 'service1', running: true },
         ],
         'Uk': [
           { name: 'service1' },
           { name: 'service2' },
+          { name: 'service1', running: true },
           { name: 'service2' }
         ],
       }
     }
   },
   mounted() {
-    this.$refs.c.width = window.innerWidth
-    this.$refs.c.height = window.innerHeight
+    this.$refs.c.width = document.body.scrollWidth
+    this.$refs.c.height = document.body.scrollHeight
     this.ctx = this.$refs.c.getContext('2d')
 
     this.tick()
@@ -78,11 +81,11 @@ export default {
         let statusSquareCoord = this.$refs[`s-${i}`][0].$el.getBoundingClientRect()
 
 
-        let teamSquareCenterY = teamSquareCoord.top + teamSquareCoord.height / 2
-        let teamSquareRightX = teamSquareCoord.left + teamSquareCoord.width
+        let teamSquareCenterY = teamSquareCoord.y + window.scrollY + teamSquareCoord.height / 2
+        let teamSquareRightX = teamSquareCoord.x + teamSquareCoord.width
 
-        let statusSquareCenterY = statusSquareCoord.top + statusSquareCoord.height / 2
-        let statusSquareRightX = statusSquareCoord.left
+        let statusSquareCenterY = statusSquareCoord.y + window.scrollY + statusSquareCoord.height / 2
+        let statusSquareRightX = statusSquareCoord.x
 
         coord.push({
           from: { x: teamSquareRightX, y: teamSquareCenterY },
