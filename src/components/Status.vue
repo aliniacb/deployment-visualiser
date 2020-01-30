@@ -5,7 +5,7 @@
         <div v-for="(event, i) in pendingEvents" :key="i" class="column is-12">
           <div class="level">
             <div class="level-left">
-              <p>{{event.name}}</p>
+              <p class="has-text-weight-bold">{{event.name}}</p>
             </div>
             <div class="level-right">
               <p>Deployments: {{event.numDeployments}}</p>
