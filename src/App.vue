@@ -15,4 +15,7 @@ export default {
 
 <style lang="scss">
   @import '~bulma';
+  html {
+    scroll-behavior: smooth;
+  }
 </style>

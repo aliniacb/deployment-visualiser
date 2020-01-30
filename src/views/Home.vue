@@ -3,7 +3,7 @@
     <div class="hero-body is-small">
       <div class="container is-fluid">
         <div class="columns is-vcentered is-fullheight">
-          <div class="column is-5">
+          <div ref="teams" class="column is-5">
             <div class="columns is-multiline">
               <Team :ref="`t-${i}`" v-for="(team, teamName, i) in teams" :data="team" :teamName="teamName" :key="teamName"/>
             </div>
@@ -52,7 +52,7 @@ export default {
 
     this.tick()
 
-    setInterval(this.fetchData.bind(this), 3000)
+    setInterval(this.fetchData.bind(this), 5000)
   },
 
   methods: {
@@ -67,6 +67,8 @@ export default {
 
     mapDataToTeams() {
       let mapped = {}
+
+      this.$refs.teams.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
       mock.slice().forEach((e) => {
         if (!mapped[e[0].team]) {
