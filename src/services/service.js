@@ -36,6 +36,7 @@ function getServices() {
         .then(data => {
             return data.serviceArns.map(serviceArn => {
                 return {
+                    fullName: serviceArn.split("/")[1],
                     name: (serviceArn.split("/")[1]).split(`${environment}-`)[1],
                     serviceArn: serviceArn
                 }
@@ -51,6 +52,7 @@ function getServices() {
                 services.forEach(s => {
                     teamServices.forEach(ts => {
                         if (ts == s.name) {
+                            s.team = team
                             if (!result[team]) {
                                 result[team] = [s]
                             } else {
@@ -80,18 +82,22 @@ function describeServices(serviceArns) {
 async function getTeamStatus(teamServices) {
     let result = await describeServices(teamServices.map(s => s.serviceArn))
 
-    return result.services.map((s) => {
-        const activeDeployment = s.deployments.find(d => d.status === "PRIMARY")
-        const secondaryDeployment = s.deployments.find(d => d.status !== "PRIMARY")
+    return teamServices.map(s => {
+        const ecsServiceResult = result.services.find(res => res.serviceArn == s.serviceArn)
+
+        const activeDeployment = ecsServiceResult.deployments.find(d => d.status === "PRIMARY")
+        const secondaryDeployment = ecsServiceResult.deployments.find(d => d.status !== "PRIMARY")
 
         let status = {
-            name: s.serviceName.split('-')[1],
-            deploymentInProgress: s.deployments.length > 1,
-            numDeployments: s.deployments.length,
+            name: s.name,
+            fullName: s.fullName,
+            serviceArn: s.serviceArn,
+            deploymentInProgress: ecsServiceResult.deployments.length > 1,
+            numDeployments: ecsServiceResult.deployments.length,
+            team: s.team,
         }
 
         if (secondaryDeployment) {
-            console.log(s)
             status = {
                 ...status,
                 oldDeploymentNumTasks: secondaryDeployment.runningCount,
@@ -101,6 +107,7 @@ async function getTeamStatus(teamServices) {
         }
 
         return status
+
     })
 }
 
