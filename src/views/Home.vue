@@ -9,9 +9,9 @@
             </div>
           </div>
           <div class="column is-6 is-offset-1">
-            <div class="columns is-multiline is-vcentered is-fullheight">
-              <Status :ref="`s-${i}`" v-for="(team, teamName, i) in teams" :data="team" :key="i" />
-            </div>
+            <transition-group name="slide-fade" tag="div" :class="'columns is-multiline is-vcentered is-fullheight'">
+              <Status :ref="`s-${i}`" v-for="(team, teamName, i) in teams"  v-if="team.find(t => t.running)" :data="team" :key="i" />
+            </transition-group>
           </div>
         </div>
       </div>
@@ -36,29 +36,24 @@ export default {
       ctx: null,
       teams: {
         'Core services': [
-          { name: 'service1', running: true },
-          { name: 'service2' },
+          { name: 'service2', running: false },
           { name: 'service2' }
         ],
         'Euro': [
-          { name: 'service1' },
-          { name: 'service1', running: true },
+          { name: 'service1', running: false },
           { name: 'service2' },
           { name: 'service2' }
         ],
         'Platform': [
-          { name: 'service1' },
-          { name: 'service1', running: true },
+          { name: 'service1', running: false },
           { name: 'service2' }
         ],
         'International': [
-          { name: 'service1' },
-          { name: 'service1', running: true },
+          { name: 'service1', running: false },
         ],
         'Uk': [
-          { name: 'service1' },
+          { name: 'service1', running: false },
           { name: 'service2' },
-          { name: 'service1', running: true },
           { name: 'service2' }
         ],
       }
@@ -70,27 +65,42 @@ export default {
     this.ctx = this.$refs.c.getContext('2d')
 
     this.tick()
+
+    setInterval(this.fakeActive.bind(this), 3000)
   },
 
   methods: {
+    fakeActive() {
+      const i = Math.floor(Math.random() * Object.keys(this.teams).length)
+      let team = this.teams[Object.keys(this.teams)[i]][0]
+      team.running === true ? team.running = false : team.running = true
+      this.updateCanvasSize()
+    },
+
+    updateCanvasSize() {
+      this.$refs.c.width = document.body.scrollWidth
+      this.$refs.c.height = document.body.scrollHeight
+    },
     getDrawCoord() {
       let coord = []
 
       for (let i = 0; i < Object.keys(this.teams).length; i += 1) {
-        let teamSquareCoord = this.$refs[`t-${i}`][0].$el.getBoundingClientRect()
-        let statusSquareCoord = this.$refs[`s-${i}`][0].$el.getBoundingClientRect()
+        if (this.$refs[`s-${i}`] && this.$refs[`s-${i}`][0]) {
+          let teamSquareCoord = this.$refs[`t-${i}`][0].$el.getBoundingClientRect()
+          let statusSquareCoord = this.$refs[`s-${i}`][0].$el.getBoundingClientRect()
 
 
-        let teamSquareCenterY = teamSquareCoord.y + window.scrollY + teamSquareCoord.height / 2
-        let teamSquareRightX = teamSquareCoord.x + teamSquareCoord.width
+          let teamSquareCenterY = teamSquareCoord.y + window.scrollY + teamSquareCoord.height / 2
+          let teamSquareRightX = teamSquareCoord.x + teamSquareCoord.width
 
-        let statusSquareCenterY = statusSquareCoord.y + window.scrollY + statusSquareCoord.height / 2
-        let statusSquareRightX = statusSquareCoord.x
+          let statusSquareCenterY = statusSquareCoord.y + window.scrollY + statusSquareCoord.height / 2
+          let statusSquareRightX = statusSquareCoord.x
 
-        coord.push({
-          from: { x: teamSquareRightX, y: teamSquareCenterY },
-          to: { x: statusSquareRightX, y: statusSquareCenterY }
-        })
+          coord.push({
+            from: { x: teamSquareRightX, y: teamSquareCenterY },
+            to: { x: statusSquareRightX, y: statusSquareCenterY }
+          })
+        }
       }
 
       return coord
@@ -131,5 +141,16 @@ canvas {
   top: 0;
 
   z-index: 1;
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(10px) scale(0);
+  opacity: 0;
 }
 </style>

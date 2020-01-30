@@ -26,15 +26,5 @@ export default {
   .service-status {
     height: 300px;
     box-shadow: -5px -2px 20px 0px rgba(0, 0, 0, 0.1);
-    transform: scale(1);
-
-    transition: all .3s ease;
-
-    &.shrinked {
-      height: 0;
-
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
-      transform: scale(0);
-    }
   }
 </style>
