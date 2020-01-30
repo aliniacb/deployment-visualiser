@@ -94,6 +94,9 @@ async function getTeamStatus(teamServices) {
             serviceArn: s.serviceArn,
             deploymentInProgress: ecsServiceResult.deployments.length > 1,
             numDeployments: ecsServiceResult.deployments.length,
+            newDeploymentNumTasks: activeDeployment.runningCount,
+            desiredCount: activeDeployment.desiredCount,
+
             team: s.team,
         }
 
@@ -101,8 +104,6 @@ async function getTeamStatus(teamServices) {
             status = {
                 ...status,
                 oldDeploymentNumTasks: secondaryDeployment.runningCount,
-                newDeploymentNumTasks: activeDeployment.runningCount,
-                desiredCount: s.desiredCount,
             }
         }
 
@@ -111,7 +112,21 @@ async function getTeamStatus(teamServices) {
     })
 }
 
+async function deploymentStatus() {
+    const teamServices = await getServices()
+    console.log("Team services:")
+    console.log(teamServices)
+  
+    const statuses = await Promise.all(
+      Object.keys(teamServices)
+        .map(team => getTeamStatus(teamServices[team]))
+    )
+
+    return statuses
+  }
+
 export default {
     getServices,
-    getTeamStatus
+    getTeamStatus,
+    deploymentStatus
 }

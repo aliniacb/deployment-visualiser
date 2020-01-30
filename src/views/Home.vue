@@ -28,7 +28,7 @@
 <script>
 import Team from '@/components/Team.vue'
 import Status from '@/components/Status.vue'
-import mock from '@/services/mock.js'
+import services from '@/services/service.js'
 
 export default {
   name: 'home',
@@ -41,7 +41,8 @@ export default {
     return {
       ctx: null,
       teams: {
-      }
+      },
+      statuses: null
     }
   },
   created() {
@@ -54,30 +55,27 @@ export default {
 
     this.tick()
 
-    setInterval(this.fetchData.bind(this), 5000)
+    setInterval(this.fetchData.bind(this), 10000)
   },
 
   methods: {
-    fetchData() {
+    async fetchData() {
+      this.statuses = await services.deploymentStatus()
       this.mapDataToTeams()
-
-      const i = Math.floor(Math.random() * Object.keys(this.teams).length)
-      let team = this.teams[Object.keys(this.teams)[i]][Math.floor(Math.random() * this.teams[Object.keys(this.teams)[i]].length)]
-      team.deploymentInProgress === true ? team.deploymentInProgress = false : team.deploymentInProgress = true
       this.updateCanvasSize()
     },
 
     mapDataToTeams() {
-      let mapped = {}
+      if (this.statuses) {
+        let mapped = {}
 
-
-      mock.slice().forEach((e) => {
-        if (!mapped[e[0].team]) {
-          mapped[e[0].team] = e
-        }
-      })
-
+        this.statuses.slice().forEach((e) => {
+          if (!mapped[e[0].team]) {
+           mapped[e[0].team] = e
+          }
+       })
       this.teams = mapped
+      }
     },
 
     updateCanvasSize() {

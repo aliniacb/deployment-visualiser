@@ -8,7 +8,7 @@
               <p class="has-text-weight-bold">{{event.name}}</p>
             </div>
             <div class="level-right">
-              <p>Deployments: {{event.numDeployments}}</p>
+              <p>Progress: {{event.newDeploymentNumTasks}}/{{event.desiredCount}} tasks</p>
             </div>
           </div>
         </div>
