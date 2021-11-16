@@ -8,7 +8,7 @@
     "create-env": "./scripts/create-env.sh"
   },
   "dependencies": {
-    "aws-sdk": "^2.610.0",
+    "aws-sdk": "^2.814.0",
     "bulma": "^0.8.0",
     "core-js": "^3.4.4",
     "vue": "^2.6.10",
